@@ -1,0 +1,55 @@
+<?php
+// Database connection
+$servername = "localhost";
+$username = "root"; // default username for WAMP
+$password = ""; // default password for WAMP (empty by default)
+$database = "your_database"; // replace 'your_database' with your actual database name
+
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $database);
+
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+?>
+
+
+// Check if form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Include database connection
+    include_once "db_connection.php";
+
+    // Get form data
+    $name = $_POST["name"];
+    $email = $_POST["email"];
+    $password = $_POST["pass"];
+    $confirm_password = $_POST["c_pass"];
+
+    // Check if passwords match
+    if ($password !== $confirm_password) {
+        echo "Passwords do not match. Please try again.";
+        exit;
+    }
+
+    // Check if user already exists
+    $query = "SELECT * FROM users WHERE email = '$email'";
+    $result = mysqli_query($conn, $query);
+
+    if (mysqli_num_rows($result) > 0) {
+        echo "User with this email already exists. Please use a different email.";
+        exit;
+    }
+
+    // Insert new user into database
+    $insert_query = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
+    if (mysqli_query($conn, $insert_query)) {
+        echo "Registration successful. You can now login.";
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
+
+    // Close database connection
+    mysqli_close($conn);
+}
+?>

@@ -1,0 +1,45 @@
+<?php
+// Database connection
+$servername = "localhost";
+$username = "root"; // default username for WAMP
+$password = ""; // default password for WAMP (empty by default)
+$database = "your_database"; // replace 'your_database' with your actual database name
+
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $database);
+
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Check if form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get form data
+    $email = $_POST["email"];
+    $password = $_POST["pass"];
+
+    // Query to check if user exists
+    $query = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
+    $result = mysqli_query($conn, $query);
+
+    // Check if query executed successfully
+    if ($result) {
+        // Check if user exists
+        if (mysqli_num_rows($result) == 1) {
+            // User exists, redirect to dashboard or home page
+            header("Location: dashboard.php");
+            exit;
+        } else {
+            // User doesn't exist, show error message
+            echo "Invalid email or password. Please try again.";
+        }
+    } else {
+        // Query execution failed, show error
+        echo "Error: " . mysqli_error($conn);
+    }
+}
+
+// Close database connection
+mysqli_close($conn);
+?>
